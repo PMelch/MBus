@@ -30,7 +30,7 @@ namespace MBus
         /// <param name="handler"></param>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public MBus AddListener<T>(Action<T> handler) where T : IMBusMessage
+        public MBus Subscribe<T>(Action<T> handler) where T : IMBusMessage
         {
             // create the wrapper handler that will take care of the type checking 
             void BaseHandler(IMBusMessage message)
@@ -57,9 +57,9 @@ namespace MBus
         /// <param name="holderComponent"></param>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public MBus AddListenerUntilDestroyed<T>(Action<T> handler, Component holderComponent) where T : IMBusMessage
+        public MBus SubscribeUntilDestroyed<T>(Action<T> handler, Component holderComponent) where T : IMBusMessage
         {
-            AddListener(handler);
+            Subscribe(handler);
             
             // dynamically create a MBusOnDestroyUnSubscriber component which will take care of the unsubscription
             var component = holderComponent.gameObject.AddComponent<MBusOnDestroyUnSubscriber>();
@@ -77,9 +77,9 @@ namespace MBus
         /// <param name="holderComponent"></param>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public MBus AddListenerUntilDisabled<T>(Action<T> handler, Component holderComponent) where T : IMBusMessage
+        public MBus SubscribeUntilDisabled<T>(Action<T> handler, Component holderComponent) where T : IMBusMessage
         {
-            AddListener(handler);
+            Subscribe(handler);
 
             // dynamically create a MBusOnDisableUnSubscriber component which will take care of the unsubscription
             var component = holderComponent.gameObject.AddComponent<MBusOnDisableUnSubscriber>();
@@ -96,7 +96,7 @@ namespace MBus
         /// <param name="type"></param>
         /// <param name="handler"></param>
         /// <returns></returns>
-        public MBus RemoveListener(Type type, object handler)
+        public MBus Unsubscribe(Type type, object handler)
         {
             var baseHandlerKey = (type, handler);
             if (_baseHandlerMap.TryGetValue(baseHandlerKey, out var baseHandler))
@@ -109,15 +109,15 @@ namespace MBus
         } 
         
         /// <summary>
-        /// If you have used <see cref="AddListener{T}"/> to register a listener, you
+        /// If you have used <see cref="Subscribe{T}"/> to register a listener, you
         /// need to manually remove the listener using this function.
         /// </summary>
         /// <param name="type"></param>
         /// <param name="handler"></param>
         /// <returns></returns>
-        public MBus RemoveListener<T>(Action<T> handler) where T : IMBusMessage
+        public MBus Unsubscribe<T>(Action<T> handler) where T : IMBusMessage
         {
-            RemoveListener(typeof(T), handler);
+            Unsubscribe(typeof(T), handler);
             return this;
         }
         

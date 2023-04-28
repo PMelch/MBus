@@ -9,7 +9,7 @@ namespace MBus
     /// if you use MBus like this:
     /// <example>
     /// ...
-    /// mbus.AddListenerUntilDestroy<IMbusMessage>(OnMessage, this)
+    /// mbus.SubscribeUntilDestroyed<IMbusMessage>(OnMessage, this)
     /// ...
     /// </example>
     /// </summary>
@@ -21,7 +21,7 @@ namespace MBus
 
         private void OnDestroy()
         {
-            Bus.RemoveListener(Type, Handler);
+            Bus.Unsubscribe(Type, Handler);
             Handler = null;
         }
     }

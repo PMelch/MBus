@@ -15,7 +15,7 @@ class MyMessage : IMBusMessage
 - subscribe to messages of a specific type
 ~~~  
 // subscribe to messages of type MyMessage
-mBus.AddListener<MyMessage>(OnMyMessage);
+mBus.Subscribe<MyMessage>(OnMyMessage);
 
 // react to a received message of a specific type
 void OnMyMessage(MyMessage message) 
@@ -31,7 +31,7 @@ mBus.SendMessage(new MyMessage(){ IntVal = 42; });
 ~~~  
 // subscribe to messages of any kind 
 // and automatically unsubscribe if the object is disabled
-mBus.AddListenerUntilDisabled<IMBusMessage>(OnMessage, this);
+mBus.SubscribeUntilDisabled<IMBusMessage>(OnMessage, this);
 
 // generic handler receiving all message types
 void OnMessage(IMBusMessage message) 
@@ -40,19 +40,22 @@ void OnMessage(IMBusMessage message)
 }
 ~~~  
 ### Automatic vs manual unsubscribing
-If you use AddListener(Action) you need 
+If you use Subscribe(Action) you need 
 to unsubscribe the listener manually using
 ~~~
-mBus.RemoveListener(Action);
+mBus.Unsubscribe(Action);
 ~~~
 However, you can have MBus do that for you by specifying
 when the unsubscription should happen, using one of the following methods instead:
 ~~~
 // unsubscribe when the gameobject (this) gets disabled
-mBus.AddListenerUntilDisabled<MessageType>(Action, this);
+mBus.SubscribeUntilDisabled<MessageType>(Action, this);
 
 // ubsubscribe when the gameobject (this) gets destroyed
-mBus.AddListenerUntilDestroyed<MessageType>(Action, this);
+mBus.SubscribeUntilDestroyed<MessageType>(Action, this);
 ~~~
+
+## Installation
+
 
 
