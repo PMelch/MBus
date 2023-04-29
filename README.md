@@ -40,13 +40,13 @@ void OnMessage(IMBusMessage message)
 }
 ~~~  
 ### Automatic vs manual unsubscribing
+
 If you use Subscribe(Action) you need 
 to unsubscribe the listener manually using
 ~~~
 mBus.Unsubscribe(Action);
 ~~~
-However, you can have MBus do that for you by specifying
-when the unsubscription should happen, using one of the following methods instead:
+However, you can let MBus do this for you by specifying when to unsubscribe, using one of the following methods instead:
 ~~~
 // unsubscribe when the gameobject (this) gets disabled
 mBus.SubscribeUntilDisabled<MessageType>(Action, this);
@@ -55,7 +55,77 @@ mBus.SubscribeUntilDisabled<MessageType>(Action, this);
 mBus.SubscribeUntilDestroyed<MessageType>(Action, this);
 ~~~
 
+### Acquiring a MBus instance
+The recommended way is to use some kind of dependency injection framework
+([Zenject](https://github.com/modesttree/Zenject) or one of the [alternatives](href="https://www.libhunt.com/r/Zenject"/>)).
+
+#### Example when using Zenject
+In your installer code, create the MBus singleton
+~~~
+Container.Bind<MBus>().AsSingle();
+~~~
+
+Access the instance in an game object
+~~~
+class Player : MonoBehaviour 
+{
+    [Inject] private MBus _bus;
+    
+    public void OnTriggerEvent() 
+    {
+        _bus.SendMessage(new PlayerMessage());
+    }
+}
+~~~
+
+
+However, you can use different means to manage your MBus instance(s).
+If you have only one global instance - for example in an DontDestroyOnLoad object - you
+can use `MBusInstance` to hold and access it.
+
+~~~
+public class MBusObject : MonoBehaviour 
+{
+    private static GameObject _gameObject;
+    private MBus _bus;
+    
+    private void Awake()
+    {
+        var go = gameObject;
+        
+        if (_gameObject != null)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        _gameObject = this;
+        DontDestroyOnLoad(go);
+        
+        // set the global instance
+        _bus = new MBus();
+        MBusInstance.SetInstance(_bus);
+    }
+    
+    // when your holder object gets destroyed, also remove the global MBus instance
+    private void OnDestroy() 
+    {
+        MBusInstance.SetInstance(null);
+    }
+}
+
+
+~~~
+
 ## Installation
+Install MBus using Unity's package manager. Select "Add package from git URL" and enter
+~~~
+https://github.com/PMelch/MBus.git#<version>
+~~~
+
+Specify the version you want to install - for example 1.0.0.
+
+
 
 
 
