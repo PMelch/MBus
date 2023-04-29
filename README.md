@@ -6,7 +6,7 @@ MBus is a message bus system for Unity that allows you to communicate between di
 
 - declare a new message type
 ~~~
-class MyMessage : IMBusMessage 
+class MyMessage 
 {
     public int IntVal;
 }
@@ -31,10 +31,10 @@ mBus.SendMessage(new MyMessage(){ IntVal = 42; });
 ~~~  
 // subscribe to messages of any kind 
 // and automatically unsubscribe if the object is disabled
-mBus.SubscribeUntilDisabled<IMBusMessage>(OnMessage, this);
+mBus.SubscribeUntilDisabled<object>(OnMessage, this);
 
 // generic handler receiving all message types
-void OnMessage(IMBusMessage message) 
+void OnMessage(object message) 
 {
     Debug.Log($"{message.GetType()}");
 }

@@ -9,7 +9,7 @@ namespace MBus
     /// if you use MBus like this:
     /// <example>
     /// ...
-    /// mbus.SubscribeUntilDestroyed<IMbusMessage>(OnMessage, this)
+    /// mbus.SubscribeUntilDestroyed<object>(OnMessage, this)
     /// ...
     /// </example>
     /// </summary>

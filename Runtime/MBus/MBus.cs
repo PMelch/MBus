@@ -17,23 +17,23 @@ namespace MBus
     /// </summary>
     public class MBus
     {
-        private readonly List<Action<IMBusMessage>> _handlers = new();
-        private readonly Dictionary<(Type, object), Action<IMBusMessage>> _baseHandlerMap = new();
+        private readonly List<Action<object>> _handlers = new();
+        private readonly Dictionary<(Type, object), Action<object>> _baseHandlerMap = new();
         private bool _sendingInProgress;
-        private readonly Queue<IMBusMessage> _pendingMessages = new();
+        private readonly Queue<object> _pendingMessages = new();
 
         /// <summary>
         /// Add a listener for a type of message.
-        /// This can either be very specific message or the root message type (IMbusMessage).
+        /// This can either be very specific message or just object (which could receive any type of message).
         /// If you use this method, you'll have to manually unsubscribe the handler later on.
         /// </summary>
         /// <param name="handler"></param>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public MBus Subscribe<T>(Action<T> handler) where T : IMBusMessage
+        public MBus Subscribe<T>(Action<T> handler)
         {
             // create the wrapper handler that will take care of the type checking 
-            void BaseHandler(IMBusMessage message)
+            void BaseHandler(object message)
             {
                 if (message is T tMessage)
                 {
@@ -57,7 +57,7 @@ namespace MBus
         /// <param name="holderComponent"></param>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public MBus SubscribeUntilDestroyed<T>(Action<T> handler, Component holderComponent) where T : IMBusMessage
+        public MBus SubscribeUntilDestroyed<T>(Action<T> handler, Component holderComponent)
         {
             Subscribe(handler);
             
@@ -77,7 +77,7 @@ namespace MBus
         /// <param name="holderComponent"></param>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public MBus SubscribeUntilDisabled<T>(Action<T> handler, Component holderComponent) where T : IMBusMessage
+        public MBus SubscribeUntilDisabled<T>(Action<T> handler, Component holderComponent)
         {
             Subscribe(handler);
 
@@ -115,7 +115,7 @@ namespace MBus
         /// <param name="type"></param>
         /// <param name="handler"></param>
         /// <returns></returns>
-        public MBus Unsubscribe<T>(Action<T> handler) where T : IMBusMessage
+        public MBus Unsubscribe<T>(Action<T> handler)
         {
             Unsubscribe(typeof(T), handler);
             return this;
@@ -126,7 +126,7 @@ namespace MBus
         /// </summary>
         /// <param name="message"></param>
         /// <typeparam name="T"></typeparam>
-        public void SendMessage<T>(T message) where T : IMBusMessage
+        public void SendMessage<T>(T message)
         {
             // In case we're already in the process of sending a message, let's queue this message for afterwards.
             // The reason for that is we want to keep the order of messages consistent for all message handlers.

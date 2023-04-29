@@ -16,30 +16,30 @@ namespace MBus
             _instance = bus;
         }
 
-        public static MBus Subscribe<T>(Action<T> handler) where T : IMBusMessage
+        public static MBus Subscribe<T>(Action<T> handler)
         {
             _instance?.Subscribe(handler);
             return _instance;
         }
-        public static MBus SubscribeUntilDestroyed<T>(Action<T> handler, Component holderComponent) where T : IMBusMessage
+        public static MBus SubscribeUntilDestroyed<T>(Action<T> handler, Component holderComponent)
         {
             _instance?.SubscribeUntilDestroyed(handler, holderComponent);
             return _instance;
         }
         
-        public static MBus SubscribeUntilDisabled<T>(Action<T> handler, Component holderComponent) where T : IMBusMessage
+        public static MBus SubscribeUntilDisabled<T>(Action<T> handler, Component holderComponent)
         {
             _instance?.SubscribeUntilDisabled(handler, holderComponent);
             return _instance;
         }
 
-        public static MBus Unsubscribe<T>(Action<T> handler) where T : IMBusMessage
+        public static MBus Unsubscribe<T>(Action<T> handler)
         {
             _instance?.Unsubscribe(handler);
             return _instance;
         }
         
-        public static void SendMessage<T>(T message) where T : IMBusMessage
+        public static void SendMessage<T>(T message)
         {
             _instance?.SendMessage(message);
         }
