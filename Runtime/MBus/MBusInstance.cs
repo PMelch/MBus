@@ -38,5 +38,10 @@ namespace MBus
             _instance?.Unsubscribe(handler);
             return _instance;
         }
+        
+        public static void SendMessage<T>(T message) where T : IMBusMessage
+        {
+            _instance?.SendMessage(message);
+        }
     }
 }
