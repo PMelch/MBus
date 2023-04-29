@@ -38,6 +38,10 @@ void OnMessage(object message)
 {
     Debug.Log($"{message.GetType()}");
 }
+
+// send messages of any type
+mBus.SendMessage("Foo");
+mBus.SendMessage(42);
 ~~~  
 ### Automatic vs manual unsubscribing
 
