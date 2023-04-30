@@ -16,7 +16,7 @@ namespace MBus
     /// </summary>
     public class MBus
     {
-        private readonly List<Action<object>> _handlers = new();
+        private readonly Dictionary<Type, List<Action<object>>> _handlers = new();
         private readonly Dictionary<(Type, object), Action<object>> _baseHandlerMap = new();
         private bool _sendingInProgress;
         private readonly Queue<object> _pendingMessages = new();
@@ -34,16 +34,17 @@ namespace MBus
             // create the wrapper handler that will take care of the type checking 
             void BaseHandler(object message)
             {
-                if (message is T tMessage)
-                {
-                    handler.Invoke(tMessage);
-                }
+                handler.Invoke((T)message);
             }
 
             // add the mapping to determine the actual used handler derived from the user type and action. 
-            _baseHandlerMap.Add((typeof(T), handler), BaseHandler);
+            var messageType = typeof(T);
+            _baseHandlerMap.Add((messageType, handler), BaseHandler);
+            
             // remember the wrapped handler
-            _handlers.Add(BaseHandler);
+            var typeHandlers = _handlers.GetValueOrDefault(messageType, new List<Action<object>>());;
+            typeHandlers.Add(BaseHandler);
+            _handlers[messageType] = typeHandlers;
             
             return this;
         }
@@ -71,19 +72,20 @@ namespace MBus
             // create the wrapper handler that will take care of the type checking 
             void BaseHandler(object message)
             {
-                if (message is T tMessage)
+                if (message.Equals(value))
                 {
-                    if (tMessage.Equals(value))
-                    {
-                        handler.Invoke();
-                    }
+                    handler.Invoke();
                 }
             }
 
             // add the mapping to determine the actual used handler derived from the user type and action. 
-            _baseHandlerMap.Add((typeof(T), handler), BaseHandler);
+            var messageType = typeof(T);
+            _baseHandlerMap.Add((messageType, handler), BaseHandler);
+            
             // remember the wrapped handler
-            _handlers.Add(BaseHandler);
+            var typeHandlers = _handlers.GetValueOrDefault(messageType, new List<Action<object>>());;
+            typeHandlers.Add(BaseHandler);
+            _handlers[messageType] = typeHandlers;
             
             return this;
         }
@@ -164,7 +166,10 @@ namespace MBus
             if (_baseHandlerMap.TryGetValue(baseHandlerKey, out var baseHandler))
             {
                 _baseHandlerMap.Remove(baseHandlerKey);
-                _handlers.Remove(baseHandler);
+                if (_handlers.TryGetValue(type, out var list))
+                {
+                    list.Remove(baseHandler);
+                }
             }
 
             return this;
@@ -199,19 +204,26 @@ namespace MBus
             else
             {
                 _sendingInProgress = true;
-                for (var t = 0; t < _handlers.Count; t++)
+                foreach (var key in _handlers.Keys)
                 {
-                    var handler = _handlers[t];
-                    try
+                    if (key.IsInstanceOfType(message))
                     {
-                        handler.Invoke(message);
-                    }
-                    catch (Exception e)
-                    {
-                        Debug.Log($"Got an error while invoking message handler for {typeof(T)}:{message}");
-                        Debug.Log(e.Message);
-                    }
+                        var handlers = _handlers[key];
+                        foreach (var handler in handlers)
+                        {
+                            try
+                            {
+                                handler.Invoke(message);
+                            }
+                            catch (Exception e)
+                            {
+                                Debug.Log($"Got an error while invoking message handler for {typeof(T)}:{message}");
+                                Debug.Log(e.Message);
+                            }
+                        }
+                    }                    
                 }
+                
 
                 _sendingInProgress = false;
                 
