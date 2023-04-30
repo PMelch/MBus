@@ -13,12 +13,8 @@ namespace MBus
     /// ...
     /// </example>
     /// </summary>
-    public class MBusOnDisableUnSubscriber : MonoBehaviour 
+    public class MBusOnDisableUnSubscriber : MBusUnSubscriberBase 
     {
-        internal object Handler;
-        internal MBus Bus;
-        internal Type Type;
-
         private void OnDisable()
         {
             Bus.Unsubscribe(Type, Handler);

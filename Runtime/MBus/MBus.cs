@@ -48,6 +48,46 @@ namespace MBus
             return this;
         }
 
+
+        /// <summary>
+        /// Add a listener for a specific type and value.
+        /// <example><code>
+        ///
+        /// public void OnMessage100()
+        /// {
+        /// }
+        ///
+        /// // trigger callback only if message type is Type1
+        /// mBus.Subscribe(OnMessage100, 100);
+        /// 
+        /// </code>
+        /// </example>
+        /// </summary>
+        /// <param name="handler"></param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public MBus Subscribe<T>(Action handler, T value) 
+        {
+            // create the wrapper handler that will take care of the type checking 
+            void BaseHandler(object message)
+            {
+                if (message is T tMessage)
+                {
+                    if (tMessage.Equals(value))
+                    {
+                        handler.Invoke();
+                    }
+                }
+            }
+
+            // add the mapping to determine the actual used handler derived from the user type and action. 
+            _baseHandlerMap.Add((typeof(T), handler), BaseHandler);
+            // remember the wrapped handler
+            _handlers.Add(BaseHandler);
+            
+            return this;
+        }
+
         /// <summary>
         /// Add a listener to a specific message type.
         /// The listener will be unsubscribed when the game object gets destroyed.
@@ -59,15 +99,26 @@ namespace MBus
         public MBus SubscribeUntilDestroyed<T>(Action<T> handler, Component holderComponent)
         {
             Subscribe(handler);
-            
-            // dynamically create a MBusOnDestroyUnSubscriber component which will take care of the unsubscription
-            var component = holderComponent.gameObject.AddComponent<MBusOnDestroyUnSubscriber>();
-            component.Bus = this;
-            component.Handler = handler;
-            component.Type = typeof(T);
+            AddOnDestroyedUnSubscriber<T>(handler, holderComponent);
             return this;
         }
 
+
+        /// <summary>
+        /// Add a listener to a specific message type and value.
+        /// The listener will be unsubscribed when the game object gets destroyed.
+        /// </summary>
+        /// <param name="handler"></param>
+        /// <param name="holderComponent"></param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public MBus SubscribeUntilDestroyed<T>(Action handler, T value, Component holderComponent) 
+        {
+            Subscribe(handler, value);
+            AddOnDestroyedUnSubscriber<T>(handler, holderComponent);
+            return this;
+        }
+        
         /// <summary>
         /// Add a listener to a specific message type.
         /// The listener will be unsubscribed when the game object gets disabled.
@@ -79,12 +130,24 @@ namespace MBus
         public MBus SubscribeUntilDisabled<T>(Action<T> handler, Component holderComponent)
         {
             Subscribe(handler);
+            AddOnDisabledUnSubscriber<T>(handler, holderComponent);
+            return this;
+        }
 
-            // dynamically create a MBusOnDisableUnSubscriber component which will take care of the unsubscription
-            var component = holderComponent.gameObject.AddComponent<MBusOnDisableUnSubscriber>();
-            component.Bus = this;
-            component.Handler = handler;
-            component.Type = typeof(T);
+
+
+        /// <summary>
+        /// Add a listener to a specific message type and value.
+        /// The listener will be unsubscribed when the game object gets disabled.
+        /// </summary>
+        /// <param name="handler"></param>
+        /// <param name="holderComponent"></param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public MBus SubscribeUntilDisabled<T>(Action handler, T value, Component holderComponent) 
+        {
+            Subscribe(handler, value);
+            AddOnDisabledUnSubscriber<T>(handler, holderComponent);
             return this;
         }
 
@@ -158,6 +221,25 @@ namespace MBus
                     SendMessage(queuedMessage);
                 }
             }
+        }
+        
+        
+        private void AddOnDestroyedUnSubscriber<T>(object handler, Component holderComponent)
+        {
+            // dynamically create a MBusOnDestroyUnSubscriber component which will take care of the unsubscription
+            var component = holderComponent.gameObject.AddComponent<MBusOnDestroyUnSubscriber>();
+            component.Bus = this;
+            component.Handler = handler;
+            component.Type = typeof(T);
+        }
+
+        private void AddOnDisabledUnSubscriber<T>(object handler, Component holderComponent)
+        {
+            // dynamically create a MBusOnDisableUnSubscriber component which will take care of the unsubscription
+            var component = holderComponent.gameObject.AddComponent<MBusOnDisableUnSubscriber>();
+            component.Bus = this;
+            component.Handler = handler;
+            component.Type = typeof(T);
         }
     }
 }

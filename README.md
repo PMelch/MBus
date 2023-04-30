@@ -90,25 +90,23 @@ can use `MBusInstance` to hold and access it.
 ~~~
 public class MBusObject : MonoBehaviour 
 {
-    private static GameObject _gameObject;
-    private MBus _bus;
+    private static GameObject _instance;
     
     private void Awake()
     {
         var go = gameObject;
         
-        if (_gameObject != null)
+        if (_instance != null)
         {
             Destroy(gameObject);
             return;
         }
 
-        _gameObject = this;
+        _instance = this;
         DontDestroyOnLoad(go);
         
         // set the global instance
-        _bus = new MBus();
-        MBusInstance.SetInstance(_bus);
+        MBusInstance.SetInstance(new MBus());
     }
     
     // when your holder object gets destroyed, also remove the global MBus instance
