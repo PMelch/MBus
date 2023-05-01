@@ -82,7 +82,7 @@ class Player : MonoBehaviour
 }
 ~~~
 
-
+#### Via game object
 However, you can use different means to manage your MBus instance(s).
 If you have only one global instance - for example in an DontDestroyOnLoad object - you
 can use `MBusInstance` to hold and access it.
