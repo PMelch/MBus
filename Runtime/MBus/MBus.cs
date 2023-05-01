@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using MBus.components;
 using UnityEngine;
 
 namespace MBus
@@ -17,7 +18,8 @@ namespace MBus
     public class MBus
     {
         private readonly Dictionary<Type, List<Action<object>>> _handlers = new();
-        private readonly Dictionary<(Type, object), Action<object>> _baseHandlerMap = new();
+        private readonly Dictionary<(Type, object), Action<object>> _baseTypeHandlerMap = new();
+        private readonly Dictionary<(Type, object), List<Action>> _valueHandlers = new();
         private bool _sendingInProgress;
         private readonly Queue<object> _pendingMessages = new();
 
@@ -39,7 +41,7 @@ namespace MBus
 
             // add the mapping to determine the actual used handler derived from the user type and action. 
             var messageType = typeof(T);
-            _baseHandlerMap.Add((messageType, handler), BaseHandler);
+            _baseTypeHandlerMap.Add((messageType, handler), BaseHandler);
             
             // remember the wrapped handler
             var typeHandlers = _handlers.GetValueOrDefault(messageType, new List<Action<object>>());;
@@ -69,23 +71,14 @@ namespace MBus
         /// <returns></returns>
         public MBus Subscribe<T>(Action handler, T value) 
         {
-            // create the wrapper handler that will take care of the type checking 
-            void BaseHandler(object message)
-            {
-                if (message.Equals(value))
-                {
-                    handler.Invoke();
-                }
-            }
-
             // add the mapping to determine the actual used handler derived from the user type and action. 
             var messageType = typeof(T);
-            _baseHandlerMap.Add((messageType, handler), BaseHandler);
             
             // remember the wrapped handler
-            var typeHandlers = _handlers.GetValueOrDefault(messageType, new List<Action<object>>());;
-            typeHandlers.Add(BaseHandler);
-            _handlers[messageType] = typeHandlers;
+            var keyTuple = (messageType, value);
+            var typeHandlers = _valueHandlers.GetValueOrDefault(keyTuple, new List<Action>());;
+            typeHandlers.Add(handler);
+            _valueHandlers[keyTuple] = typeHandlers;
             
             return this;
         }
@@ -117,7 +110,9 @@ namespace MBus
         public MBus SubscribeUntilDestroyed<T>(Action handler, T value, Component holderComponent) 
         {
             Subscribe(handler, value);
-            AddOnDestroyedUnSubscriber<T>(handler, holderComponent);
+            var component = AddOnDestroyedUnSubscriber<T>(handler, holderComponent);
+            component.IsValueSubscription = true;
+            component.Value = value;
             return this;
         }
         
@@ -149,7 +144,9 @@ namespace MBus
         public MBus SubscribeUntilDisabled<T>(Action handler, T value, Component holderComponent) 
         {
             Subscribe(handler, value);
-            AddOnDisabledUnSubscriber<T>(handler, holderComponent);
+            var component = AddOnDisabledUnSubscriber<T>(handler, holderComponent);
+            component.IsValueSubscription = true;
+            component.Value = value;
             return this;
         }
 
@@ -163,9 +160,9 @@ namespace MBus
         public MBus Unsubscribe(Type type, object handler)
         {
             var baseHandlerKey = (type, handler);
-            if (_baseHandlerMap.TryGetValue(baseHandlerKey, out var baseHandler))
+            if (_baseTypeHandlerMap.TryGetValue(baseHandlerKey, out var baseHandler))
             {
-                _baseHandlerMap.Remove(baseHandlerKey);
+                _baseTypeHandlerMap.Remove(baseHandlerKey);
                 if (_handlers.TryGetValue(type, out var list))
                 {
                     list.Remove(baseHandler);
@@ -189,6 +186,24 @@ namespace MBus
         }
         
         /// <summary>
+        /// If you have used <see cref="Subscribe{T}(System.Action,T)("/> to register a listener, you
+        /// need to manually remove the listener using this function.
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="handler"></param>
+        /// <returns></returns>
+        public MBus Unsubscribe<T>(Action handler, T value)
+        {
+            var keyTuple = (value.GetType(), value);
+            if (_valueHandlers.TryGetValue(keyTuple, out var handlers))
+            {
+                handlers.Remove(handler);
+            }
+
+            return this;
+        }
+        
+        /// <summary>
         /// Send a message to the bus which will notify all handlers.
         /// </summary>
         /// <param name="message"></param>
@@ -204,6 +219,7 @@ namespace MBus
             else
             {
                 _sendingInProgress = true;
+                // invoke all type handlers
                 foreach (var key in _handlers.Keys)
                 {
                     if (key.IsInstanceOfType(message))
@@ -214,6 +230,27 @@ namespace MBus
                             try
                             {
                                 handler.Invoke(message);
+                            }
+                            catch (Exception e)
+                            {
+                                Debug.Log($"Got an error while invoking message handler for {typeof(T)}:{message}");
+                                Debug.Log(e.Message);
+                            }
+                        }
+                    }                    
+                }
+                
+                // invoke all type/value handlers
+                foreach (var keyTuple in _valueHandlers.Keys)
+                {
+                    if (keyTuple.Item1.IsInstanceOfType(message) && (keyTuple.Item2?.Equals(message) ?? false))
+                    {
+                        var handlers = _valueHandlers[keyTuple];
+                        foreach (var handler in handlers)
+                        {
+                            try
+                            {
+                                handler.Invoke();
                             }
                             catch (Exception e)
                             {
@@ -236,22 +273,24 @@ namespace MBus
         }
         
         
-        private void AddOnDestroyedUnSubscriber<T>(object handler, Component holderComponent)
+        private MBusOnDestroyUnSubscriber AddOnDestroyedUnSubscriber<T>(object handler, Component holderComponent)
         {
             // dynamically create a MBusOnDestroyUnSubscriber component which will take care of the unsubscription
             var component = holderComponent.gameObject.AddComponent<MBusOnDestroyUnSubscriber>();
             component.Bus = this;
             component.Handler = handler;
             component.Type = typeof(T);
+            return component;
         }
 
-        private void AddOnDisabledUnSubscriber<T>(object handler, Component holderComponent)
+        private MBusOnDisableUnSubscriber AddOnDisabledUnSubscriber<T>(object handler, Component holderComponent)
         {
             // dynamically create a MBusOnDisableUnSubscriber component which will take care of the unsubscription
             var component = holderComponent.gameObject.AddComponent<MBusOnDisableUnSubscriber>();
             component.Bus = this;
             component.Handler = handler;
             component.Type = typeof(T);
+            return component;
         }
     }
 }

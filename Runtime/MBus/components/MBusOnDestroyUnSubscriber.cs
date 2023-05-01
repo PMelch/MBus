@@ -1,7 +1,4 @@
-using System;
-using UnityEngine;
-
-namespace MBus
+namespace MBus.components
 {
     /// <summary>
     /// Helper component that will react to Unity's OnDestroy event to unregister a specific message handler.
@@ -17,7 +14,14 @@ namespace MBus
     {
         private void OnDestroy()
         {
-            Bus.Unsubscribe(Type, Handler);
+            if (IsValueSubscription)
+            {
+                Bus.Unsubscribe((System.Action)Handler, Value);
+            }
+            else
+            {
+                Bus.Unsubscribe(Type, Handler);
+            }
             Handler = null;
         }
     }

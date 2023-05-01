@@ -158,5 +158,66 @@ namespace Tests.Editor
             Assert.AreEqual(baseReceived, 1);
             Assert.AreEqual(sub1Received, 0);
         }
+
+        [Test]
+        public void TestUnsubscription()
+        {
+            var bus = new MBus.MBus();
+
+            var sCalled = 0;
+            void OnString(string value)
+            {
+                ++sCalled;
+            }
+            var vCalled = 0;
+            void OnValue()
+            {
+                ++vCalled;
+            }
+
+            bus.Subscribe<string>(OnString);
+            bus.Subscribe(OnValue, "foo");
+            bus.SendMessage("foo");
+            Assert.AreEqual(sCalled, 1);
+            Assert.AreEqual(vCalled, 1);
+            
+            bus.Unsubscribe<string>(OnString);
+            bus.SendMessage("foo");
+            Assert.AreEqual(sCalled, 1);
+            Assert.AreEqual(vCalled, 2);
+            
+            bus.Unsubscribe(OnValue, "foo");
+            bus.SendMessage("foo");
+            Assert.AreEqual(sCalled, 1);
+            Assert.AreEqual(vCalled, 2);
+        }
+        
+        [Test]
+        public void TestMultipleValueSubscriptionWithSameCallback()
+        {
+            var bus = new MBus.MBus();
+
+            var vCalled = 0;
+            void OnValue()
+            {
+                ++vCalled;
+            }
+
+            bus.Subscribe(OnValue, "foo");
+            bus.Subscribe(OnValue, "bar");
+            bus.SendMessage("foo");
+            bus.SendMessage("bar");
+            Assert.AreEqual(vCalled, 2);
+            
+            bus.Unsubscribe(OnValue, "foo");
+            bus.SendMessage("foo");
+            bus.SendMessage("bar");
+            Assert.AreEqual(vCalled, 3);
+            
+            bus.Unsubscribe(OnValue, "bar");
+            bus.SendMessage("foo");
+            bus.SendMessage("bar");
+            Assert.AreEqual(vCalled, 3);
+        }
     }
 }
