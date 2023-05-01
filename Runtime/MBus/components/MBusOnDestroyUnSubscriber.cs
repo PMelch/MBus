@@ -14,6 +14,12 @@ namespace MBus.components
     {
         private void OnDestroy()
         {
+            PerformUnsubscription();
+            Handler = null;
+        }
+
+        private void PerformUnsubscription()
+        {
             if (IsValueSubscription)
             {
                 Bus.Unsubscribe((System.Action)Handler, Value);
@@ -22,7 +28,6 @@ namespace MBus.components
             {
                 Bus.Unsubscribe(Type, Handler);
             }
-            Handler = null;
         }
     }
 }

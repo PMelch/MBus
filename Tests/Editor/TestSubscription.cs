@@ -1,5 +1,9 @@
+using System;
 using System.Collections.Generic;
+using System.Reflection;
+using MBus.components;
 using NUnit.Framework;
+using UnityEngine;
 
 namespace Tests.Editor
 {
@@ -26,8 +30,8 @@ namespace Tests.Editor
             bus.Subscribe<string>(OnMessageString);
             bus.Subscribe<int>(OnMessageInt);
             bus.SendMessage("foo");
-            Assert.AreEqual(stringCalled, 1);
-            Assert.AreEqual(intCalled, 0);
+            Assert.AreEqual(1, stringCalled);
+            Assert.AreEqual(0, intCalled);
         }
 
         [Test]
@@ -45,7 +49,7 @@ namespace Tests.Editor
             bus.Subscribe<object>(OnMessage);
             bus.Subscribe<string>(OnMessage);
             bus.SendMessage("foo");
-            Assert.AreEqual(called, 2);
+            Assert.AreEqual(2, called);
         }
 
         [Test]
@@ -70,8 +74,8 @@ namespace Tests.Editor
             bus.SendMessage("foo");
             bus.SendMessage("foo");
             bus.SendMessage("bar");
-            Assert.AreEqual(calledFoo, 2);
-            Assert.AreEqual(calledBar, 1);
+            Assert.AreEqual(2, calledFoo);
+            Assert.AreEqual(1, calledBar);
         }
 
         [Test]
@@ -98,7 +102,7 @@ namespace Tests.Editor
             bus.Subscribe<string>(OnMessage1);
             bus.Subscribe<string>(OnMessage2);
             bus.SendMessage("foo");
-            Assert.AreEqual(valuesReceived, new[] { "foo", "foo", "bar", "bar" });
+            Assert.AreEqual(new[] { "foo", "foo", "bar", "bar" }, valuesReceived);
         }
 
         private class Base
@@ -153,10 +157,10 @@ namespace Tests.Editor
             bus.Subscribe<Sub2>(OnMessageSub2);
             bus.Subscribe<Sub3>(OnMessageSub3);
             bus.SendMessage(new Sub3());
-            Assert.AreEqual(sub3Received, 1);
-            Assert.AreEqual(sub2Received, 1);
-            Assert.AreEqual(baseReceived, 1);
-            Assert.AreEqual(sub1Received, 0);
+            Assert.AreEqual(1, sub3Received);
+            Assert.AreEqual(1, sub2Received);
+            Assert.AreEqual(1, baseReceived);
+            Assert.AreEqual(0, sub1Received);
         }
 
         [Test]
@@ -178,18 +182,18 @@ namespace Tests.Editor
             bus.Subscribe<string>(OnString);
             bus.Subscribe(OnValue, "foo");
             bus.SendMessage("foo");
-            Assert.AreEqual(sCalled, 1);
-            Assert.AreEqual(vCalled, 1);
+            Assert.AreEqual(1, sCalled);
+            Assert.AreEqual(1, vCalled);
             
             bus.Unsubscribe<string>(OnString);
             bus.SendMessage("foo");
-            Assert.AreEqual(sCalled, 1);
-            Assert.AreEqual(vCalled, 2);
+            Assert.AreEqual(1, sCalled);
+            Assert.AreEqual(2, vCalled);
             
             bus.Unsubscribe(OnValue, "foo");
             bus.SendMessage("foo");
-            Assert.AreEqual(sCalled, 1);
-            Assert.AreEqual(vCalled, 2);
+            Assert.AreEqual(1, sCalled);
+            Assert.AreEqual(2, vCalled);
         }
         
         [Test]
@@ -207,17 +211,105 @@ namespace Tests.Editor
             bus.Subscribe(OnValue, "bar");
             bus.SendMessage("foo");
             bus.SendMessage("bar");
-            Assert.AreEqual(vCalled, 2);
+            Assert.AreEqual(2, vCalled);
             
             bus.Unsubscribe(OnValue, "foo");
             bus.SendMessage("foo");
             bus.SendMessage("bar");
-            Assert.AreEqual(vCalled, 3);
+            Assert.AreEqual(3, vCalled);
             
             bus.Unsubscribe(OnValue, "bar");
             bus.SendMessage("foo");
             bus.SendMessage("bar");
-            Assert.AreEqual(vCalled, 3);
+            Assert.AreEqual(3, vCalled);
+        }
+
+        [Test]
+        public void TestAutoUnsubscribeOnDisable()
+        {
+            var bus = new MBus.MBus();
+
+            var vCalled = 0;
+            void OnValue()
+            {
+                ++vCalled;
+            }
+
+            var sCalled = 0;
+            void OnString(string value)
+            {
+                ++sCalled;
+            }
+
+            var gameObject = new GameObject();
+            var transform = gameObject.AddComponent<RectTransform>();
+            bus.SubscribeUntilDisabled(OnValue, "foo", transform);
+            bus.SubscribeUntilDisabled<string>(OnString, transform);
+
+            var autoUnSubscriberComponents = gameObject.GetComponents<MBusOnDisableUnSubscriber>();
+            Assert.AreEqual(2, autoUnSubscriberComponents.Length);
+            
+            bus.SendMessage("foo");
+            Assert.AreEqual(1, sCalled);
+            Assert.AreEqual(1, vCalled);
+
+            Type type = typeof(MBusOnDisableUnSubscriber);
+            var methodInfo = type.GetMethod("PerformUnsubscription", BindingFlags.NonPublic | BindingFlags.Instance);
+            
+            Assert.NotNull(methodInfo);
+            foreach (var component in autoUnSubscriberComponents)
+            {
+                methodInfo.Invoke(component,Array.Empty<object>());
+            }
+
+            bus.SendMessage("foo");
+            Assert.AreEqual(1, sCalled);
+            Assert.AreEqual(1, vCalled);
+        }
+        
+        [Test]
+        public void TestAutoUnsubscribeOnDestroy()
+        {
+            var bus = new MBus.MBus();
+
+            var vCalled = 0;
+            void OnValue()
+            {
+                ++vCalled;
+            }
+
+            var sCalled = 0;
+            void OnString(string value)
+            {
+                ++sCalled;
+            }
+
+            var gameObject = new GameObject();
+            var transform = gameObject.AddComponent<RectTransform>();
+            bus.SubscribeUntilDestroyed(OnValue, "foo", transform);
+            bus.Subscribe(OnValue, "bar");
+            bus.SubscribeUntilDestroyed<string>(OnString, transform);
+
+            var autoUnSubscriberComponents = gameObject.GetComponents<MBusOnDestroyUnSubscriber>();
+            Assert.AreEqual(2, autoUnSubscriberComponents.Length);
+            
+            bus.SendMessage("foo");
+            Assert.AreEqual(1, sCalled);
+            Assert.AreEqual(1, vCalled);
+
+            Type type = typeof(MBusOnDestroyUnSubscriber);
+            var methodInfo = type.GetMethod("PerformUnsubscription", BindingFlags.NonPublic | BindingFlags.Instance);
+            
+            Assert.NotNull(methodInfo);
+            foreach (var component in autoUnSubscriberComponents)
+            {
+                methodInfo.Invoke(component,Array.Empty<object>());
+            }
+
+            bus.SendMessage("foo");
+            bus.SendMessage("bar");
+            Assert.AreEqual(1, sCalled);
+            Assert.AreEqual(2, vCalled);
         }
     }
 }
