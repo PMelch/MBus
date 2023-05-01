@@ -1,4 +1,4 @@
-# MBus
+# MBus - the Unity message bus
 MBus is a message bus system for Unity that allows you to communicate between different components of your game using messages that are classes or structs. You can use MBus to send and subscribe to messages of any type, and easily manage the lifetime of your subscriptions. You can either manually subscribe and unsubscribe to messages, or use the scope feature to automatically unsubscribe when a MonoBehaviour is destroyed or disabled. MBus is lightweight, fast and easy to use, and it helps you keep your code clean and decoupled.
 
 
