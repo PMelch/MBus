@@ -4,16 +4,13 @@ MBus is a message bus system for Unity that allows you to communicate between di
 
 ### Examples
 
-- declare a new message type
+#### Subscribe to messages of a specific type
 ~~~
 class MyMessage 
 {
     public int IntVal;
 }
-~~~    
 
-- subscribe to messages of a specific type
-~~~  
 // subscribe to messages of type MyMessage
 mBus.Subscribe<MyMessage>(OnMyMessage);
 
@@ -27,7 +24,7 @@ void OnMyMessage(MyMessage message)
 mBus.SendMessage(new MyMessage(){ IntVal = 42; });
 ~~~      
 
-- subscribe to all types of messages
+##### Subscribe to all types of messages
 ~~~  
 // subscribe to messages of any kind 
 // and automatically unsubscribe if the object is disabled
@@ -43,6 +40,29 @@ void OnMessage(object message)
 mBus.SendMessage("Foo");
 mBus.SendMessage(42);
 ~~~  
+
+##### Value subscriptions
+
+MBus can not only be used to subscribe to types, but also to specific values. 
+
+~~~
+void OnMessage(){}
+
+mBus.Subscribe(OnMessage, 100);
+mBus.Subscribe(OnMessage, "foo");
+~~~
+You can use value subscription if you prefer to use enum based message handling:
+~~~
+public enum MessageType 
+{
+   Type1,
+   Type2,
+   Type3
+}
+
+mBus.Subscribe(OnMessage, MessageType.Type1);
+~~~
+
 ### Automatic vs manual unsubscribing
 
 If you use Subscribe(Action) you need 
