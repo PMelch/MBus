@@ -75,7 +75,7 @@ However, you can let MBus do this for you by specifying when to unsubscribe, usi
 // unsubscribe when the gameobject (this) gets disabled
 mBus.SubscribeUntilDisabled<MessageType>(Action, this);
 
-// ubsubscribe when the gameobject (this) gets destroyed
+// unsubscribe when the gameobject (this) gets destroyed
 mBus.SubscribeUntilDestroyed<MessageType>(Action, this);
 ~~~
 
