@@ -136,8 +136,13 @@ public class MBusObject : MonoBehaviour
     }
 }
 
-
 ~~~
+
+Once set, MBusInstance can be used to forward commands to the global instance.
+~~~
+MBusInstance.SendMessage("foo");
+~~~
+
 
 ## Installation
 Install MBus using Unity's package manager. Select "Add package from git URL" and enter
