@@ -264,6 +264,7 @@ namespace MBus
 
                 _sendingInProgress = false;
                 
+                // now, get the first pending message, if there was any, and process it
                 if (_pendingMessages.Count>0)
                 {
                     var queuedMessage = _pendingMessages.Dequeue();
