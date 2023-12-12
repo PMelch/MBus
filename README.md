@@ -91,31 +91,32 @@ mBus.Subscribe(OnMessage, MessageType.Type1);
 
 ### Automatic vs manual unsubscribing
 
-If you use Subscribe(Action) you need 
-to unsubscribe the listener manually using
+MBus offers two ways to manage message subscriptions: manual and automatic. When you use the `Subscribe(Action)` method, you are responsible for explicitly unsubscribing from the message using the `mBus.Unsubscribe(Action)` method.
+
+However, if you want MBus to handle unsubscription for you, you can use the `SubscribeUntilDisabled<MessageType>(Action, Component)` or `SubscribeUntilDestroyed<MessageType>(Action, Component)` methods. These methods ensure that the listener is automatically unsubscribed when the GameObject to which it belongs is disabled or destroyed, respectively. This approach eliminates the need for manual unsubscription, making it more convenient and less error-prone.
+
+In summary, manual unsubscription gives you more control over when a listener unsubscribes, while automatic unsubscription simplifies the process and ensures that listeners are automatically removed when the associated GameObject is no longer relevant.
+
 ~~~
-mBus.Unsubscribe(Action);
-~~~
-However, you can let MBus do this for you by specifying when to unsubscribe, using one of the following methods instead:
-~~~
-// unsubscribe when the gameobject (this) gets disabled
+// auto-unsubscribe when the gameobject (this) gets disabled
 mBus.SubscribeUntilDisabled<MessageType>(Action, this);
 
-// unsubscribe when the gameobject (this) gets destroyed
+// auto-unsubscribe when the gameobject (this) gets destroyed
 mBus.SubscribeUntilDestroyed<MessageType>(Action, this);
 ~~~
 
-### Acquiring a MBus instance
-The recommended way is to use some kind of dependency injection framework
-([Zenject](https://github.com/modesttree/Zenject) or one of the [alternatives](href="https://www.libhunt.com/r/Zenject"/>)).
+### Obtaining a MBus instance
+The preferred method for acquiring a MBus instance is to utilize a dependency injection (DI) framework like
+([Zenject](https://github.com/modesttree/Zenject) or its [counterparts](href="https://www.libhunt.com/r/Zenject"/>)).
+This approach streamlines dependency management and promotes code modularity.
 
-#### Example when using Zenject
-In your installer code, create the MBus singleton
+#### Example using Zenject
+In your Unity project's installer script, create a singleton instance of MBus using Zenject's DI syntax:
 ~~~
 Container.Bind<MBus>().AsSingle();
 ~~~
 
-Access the instance in an game object
+Once the singleton instance is established, your MonoBehaviour classes can access it through dependency injection:
 ~~~
 class Player : MonoBehaviour 
 {
@@ -127,11 +128,12 @@ class Player : MonoBehaviour
     }
 }
 ~~~
+By injecting the MBus instance through DI, you achieve loose coupling and promote code reusability, making your project more maintainable and adaptable to future changes.
 
 #### Via game object
-However, you can use different means to manage your MBus instance(s).
-If you have only one global instance - for example in an DontDestroyOnLoad object - you
-can use `MBusInstance` to hold and access it.
+While dependency injection is the recommended approach for managing MBus instances, you can also employ other methods, such as utilizing the `MBusInstance` class. This class acts as a central repository for accessing the global MBus instance, particularly if you have a single instance across your project.
+
+To leverage `MBusInstance`, you can instantiate it within a DontDestroyOnLoad MonoBehaviour. This ensures that the instance persists throughout the game's lifecycle. 
 
 ~~~
 public class MBusObject : MonoBehaviour 
@@ -164,11 +166,11 @@ public class MBusObject : MonoBehaviour
 
 ~~~
 
-Once set, MBusInstance can be used to forward commands to the global instance.
+Once created, you can access the global MBus instance using the `MBusInstance.SendMessage()` method:
 ~~~
 MBusInstance.SendMessage("foo");
 ~~~
-
+By utilizing `MBusInstance`, you can manage the global MBus instance more directly, particularly if you have a centralized communication hub.
 
 ## Installation
 Install MBus using Unity's package manager. Select "Add package from git URL" and enter
