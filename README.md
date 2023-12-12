@@ -4,10 +4,31 @@
 
 
 # MBus - the Unity message bus
-MBus is a message bus system for Unity that allows you to communicate between different components of your game using messages that are classes or structs. You can use MBus to send and subscribe to messages of any type, and easily manage the lifetime of your subscriptions. You can either manually subscribe and unsubscribe to messages, or use the scope feature to automatically unsubscribe when a MonoBehaviour is destroyed or disabled. MBus is lightweight, fast and easy to use, and it helps you keep your code clean and decoupled.
 
+## MBus: Seamless Communication for Your Unity Project
 
-### Examples
+Simplify inter-component communication in your Unity game with MBus, a lightweight and efficient message bus system. This powerful tool enables seamless exchange of data between different parts of your game using structured messages, whether they're classes or structs.
+
+## Effortless Message Handling
+
+MBus streamlines the process of sending and receiving messages of any type, ensuring seamless integration into your game's architecture. Customize your message handling by leveraging the flexible subscription mechanism, allowing you to manage subscriptions manually or leverage the scope feature for automatic unsubscription when a component is destroyed or disabled.
+
+## Clean and Decoupled Code
+
+MBus promotes clean and decoupled code, enhancing modularity and maintainability in your Unity projects. With MBus, you can focus on the core gameplay logic while the message bus handles the intricate communication between components.
+
+## Key Features:
+
+- Send and subscribe to messages of any type
+- Manage subscriptions manually or with the scope feature
+- Lightweight and efficient design with minimal overhead
+- Simplifies communication between different Unity components
+- Promotes clean and decoupled code structure
+- Embrace Seamless Communication with MBus
+
+Integrate MBus into your Unity game and experience the power of streamlined communication between components. MBus's lightweight and efficient design ensures a smooth and performant experience, enhancing your development workflow and game's overall structure.
+
+## Examples
 
 #### Subscribe to messages of a specific type
 ~~~
@@ -56,7 +77,7 @@ void OnMessage(){}
 mBus.Subscribe(OnMessage, 100);
 mBus.Subscribe(OnMessage, "foo");
 ~~~
-You can use value subscription if you prefer to use enum based message handling:
+Use value subscription, if you prefer to use enum based message handling:
 ~~~
 public enum MessageType 
 {
