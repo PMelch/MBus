@@ -311,5 +311,47 @@ namespace Tests.Editor
             Assert.AreEqual(1, sCalled);
             Assert.AreEqual(2, vCalled);
         }
+
+        [Test]
+        public void TestSubscribeInCallback()
+        {
+            var bus = new MBus.MBus();
+         
+            var c1Called = 0;
+            var c2Called = 0;
+            var c3Called = 0;
+            void OnString(string value)
+            {
+                ++c2Called;
+            }
+            
+            void CallBackWithSubscription()
+            {
+                ++c1Called;
+                bus.Subscribe<string>(OnString);
+            }
+
+            void CallBackWithSubscriptionForType(string value)
+            {
+                ++c3Called;
+                if (value == "subscribe")
+                {
+                    bus.Subscribe<string>(OnString);
+                }
+            }
+
+            bus.Subscribe(CallBackWithSubscription, "foo");
+            bus.SendMessage("foo");
+            bus.SendMessage("bar");
+            Assert.AreEqual(1, c1Called);
+            Assert.AreEqual(1, c2Called);
+
+            bus = new MBus.MBus();
+            bus.Subscribe<string>(CallBackWithSubscriptionForType);
+            bus.SendMessage("subscribe");
+            bus.SendMessage("bar");
+            Assert.AreEqual(2, c2Called);
+            Assert.AreEqual(2, c3Called);
+        }
     }
 }

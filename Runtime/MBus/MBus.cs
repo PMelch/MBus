@@ -220,11 +220,12 @@ namespace MBus
             {
                 _sendingInProgress = true;
                 // invoke all type handlers
-                foreach (var key in _handlers.Keys)
+                var typesCopy = new List<Type>(_handlers.Keys);
+                foreach (var key in typesCopy)
                 {
                     if (key.IsInstanceOfType(message))
                     {
-                        var handlers = _handlers[key];
+                        var handlers = new List<Action<object>>(_handlers[key]);
                         foreach (var handler in handlers)
                         {
                             try
@@ -241,11 +242,12 @@ namespace MBus
                 }
                 
                 // invoke all type/value handlers
-                foreach (var keyTuple in _valueHandlers.Keys)
+                var valuesCopy = new List<(Type, object)>(_valueHandlers.Keys);
+                foreach (var keyTuple in valuesCopy)
                 {
                     if (keyTuple.Item1.IsInstanceOfType(message) && (keyTuple.Item2?.Equals(message) ?? false))
                     {
-                        var handlers = _valueHandlers[keyTuple];
+                        var handlers = new List<Action>(_valueHandlers[keyTuple]);
                         foreach (var handler in handlers)
                         {
                             try

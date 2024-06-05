@@ -27,9 +27,21 @@ namespace MBus
             return _instance;
         }
         
+        public static MBus SubscribeUntilDestroyed<T>(Action handler, T value, Component holderComponent)
+        {
+            _instance?.SubscribeUntilDestroyed(handler, value, holderComponent);
+            return _instance;
+        }
+        
         public static MBus SubscribeUntilDisabled<T>(Action<T> handler, Component holderComponent)
         {
             _instance?.SubscribeUntilDisabled(handler, holderComponent);
+            return _instance;
+        }
+
+        public static MBus SubscribeUntilDisabled<T>(Action handler, T value, Component holderComponent)
+        {
+            _instance?.SubscribeUntilDisabled(handler, value, holderComponent);
             return _instance;
         }
 
