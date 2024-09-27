@@ -31,7 +31,7 @@ Integrate MBus into your Unity game and experience the power of streamlined comm
 ## Examples
 
 #### Subscribe to messages of a specific type
-~~~
+```C#
 class MyMessage 
 {
     public int IntVal;
@@ -48,7 +48,7 @@ void OnMyMessage(MyMessage message)
 
 // send a custom message
 mBus.SendMessage(new MyMessage(){ IntVal = 42; });
-~~~      
+```      
 
 ##### Subscribe to all types of messages
 ~~~  
