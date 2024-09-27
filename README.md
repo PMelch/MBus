@@ -51,7 +51,7 @@ mBus.SendMessage(new MyMessage(){ IntVal = 42; });
 ```      
 
 ##### Subscribe to all types of messages
-~~~  
+```C# 
 // subscribe to messages of any kind 
 // and automatically unsubscribe if the object is disabled
 mBus.SubscribeUntilDisabled<object>(OnMessage, this);
@@ -65,20 +65,20 @@ void OnMessage(object message)
 // send messages of any type
 mBus.SendMessage("Foo");
 mBus.SendMessage(42);
-~~~  
+``` 
 
 ##### Value subscriptions
 
 MBus can not only be used to subscribe to types, but also to specific values. 
 
-~~~
+```C#
 void OnMessage(){}
 
 mBus.Subscribe(OnMessage, 100);
 mBus.Subscribe(OnMessage, "foo");
-~~~
+``` 
 Use value subscription, if you prefer to use enum based message handling:
-~~~
+```C#
 public enum MessageType 
 {
    Type1,
@@ -87,7 +87,7 @@ public enum MessageType
 }
 
 mBus.Subscribe(OnMessage, MessageType.Type1);
-~~~
+``` 
 
 ### Automatic vs manual unsubscribing
 
@@ -97,13 +97,13 @@ However, if you want MBus to handle unsubscription for you, you can use the `Sub
 
 In summary, manual unsubscription gives you more control over when a listener unsubscribes, while automatic unsubscription simplifies the process and ensures that listeners are automatically removed when the associated GameObject is no longer relevant.
 
-~~~
+```C#
 // auto-unsubscribe when the gameobject (this) gets disabled
 mBus.SubscribeUntilDisabled<MessageType>(Action, this);
 
 // auto-unsubscribe when the gameobject (this) gets destroyed
 mBus.SubscribeUntilDestroyed<MessageType>(Action, this);
-~~~
+``` 
 
 ### Obtaining a MBus instance
 The preferred method for acquiring a MBus instance is to utilize a dependency injection (DI) framework like
@@ -112,12 +112,12 @@ This approach streamlines dependency management and promotes code modularity.
 
 #### Example using Zenject
 In your Unity project's installer script, create a singleton instance of MBus using Zenject's DI syntax:
-~~~
+```C#
 Container.Bind<MBus>().AsSingle();
-~~~
+``` 
 
 Once the singleton instance is established, your MonoBehaviour classes can access it through dependency injection:
-~~~
+```C#
 class Player : MonoBehaviour 
 {
     [Inject] private MBus _bus;
@@ -127,7 +127,7 @@ class Player : MonoBehaviour
         _bus.SendMessage(new PlayerMessage());
     }
 }
-~~~
+``` 
 By injecting the MBus instance through DI, you achieve loose coupling and promote code reusability, making your project more maintainable and adaptable to future changes.
 
 #### Via game object
@@ -135,7 +135,7 @@ While dependency injection is the recommended approach for managing MBus instanc
 
 To leverage `MBusInstance`, you can instantiate it within a DontDestroyOnLoad MonoBehaviour. This ensures that the instance persists throughout the game's lifecycle. 
 
-~~~
+```C#
 public class MBusObject : MonoBehaviour 
 {
     private static GameObject _instance;
@@ -164,12 +164,12 @@ public class MBusObject : MonoBehaviour
     }
 }
 
-~~~
+``` 
 
 Once created, you can access the global MBus instance using the `MBusInstance.SendMessage()` method:
-~~~
+```C#
 MBusInstance.SendMessage("foo");
-~~~
+``` 
 By utilizing `MBusInstance`, you can manage the global MBus instance more directly, particularly if you have a centralized communication hub.
 
 ## Installation
