@@ -175,10 +175,10 @@ By utilizing `MBusInstance`, you can manage the global MBus instance more direct
 ## Installation
 Install MBus using Unity's package manager. Select "Add package from git URL" and enter
 ~~~
-https://github.com/PMelch/MBus.git#<version>
+https://github.com/PMelch/MBus.git#v<version>
 ~~~
 
-Specify the version you want to install - for example 1.0.0.
+Specify the version you want to install - for example for version 1.0.0 you would use https://github.com/PMelch/MBus.git#v1.0.0
 
 
 
