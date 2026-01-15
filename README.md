@@ -183,7 +183,7 @@ openupm add com.melchart.mbus
 ~~~
 
 ### Git URL
-Install MBus using Unity's package manager. Select "Add package from git URL" and enter
+You can also install MBus using Unity's package manager. Select "Add package from git URL" and enter
 ~~~
 https://github.com/PMelch/MBus.git#v<version>
 ~~~
