@@ -210,8 +210,9 @@ namespace MBus
         /// <typeparam name="T"></typeparam>
         public void SendMessage<T>(T message)
         {
-            // In case we're already in the process of sending a message, let's queue this message for afterwards.
-            // The reason for that is we want to keep the order of messages consistent for all message handlers.
+            // If a message handler sends another message (re-entrancy), we queue it instead of processing immediately.
+            // This ensures that the original message finishes processing for all handlers first,
+            // maintaining a predictable order (BFS-like) rather than DFS-like recursion.
             if (_sendingInProgress)
             {
                 _pendingMessages.Enqueue(message);
