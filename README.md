@@ -1,6 +1,7 @@
 ![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/PMelch/MBus?logo=GitHub&style=flat-square)
 ![GitHub issues](https://img.shields.io/github/issues-raw/PMelch/MBus?style=flat-square)
 ![GitHub](https://img.shields.io/github/license/PMelch/MBus?color=%23cccc00&style=flat-square)
+[![openupm](https://img.shields.io/npm/v/com.melchart.mbus?label=openupm&registry_uri=https://package.openupm.com)](https://openupm.com/packages/com.melchart.mbus)
 
 
 # MBus - the Unity message bus
@@ -173,6 +174,15 @@ MBusInstance.SendMessage("foo");
 By utilizing `MBusInstance`, you can manage the global MBus instance more directly, particularly if you have a centralized communication hub.
 
 ## Installation
+### OpenUPM
+
+The package is available on the [openupm registry](https://openupm.com). It's recommended to install it via [openupm-cli](https://github.com/openupm/openupm-cli).
+
+~~~bash
+openupm add com.melchart.mbus
+~~~
+
+### Git URL
 Install MBus using Unity's package manager. Select "Add package from git URL" and enter
 ~~~
 https://github.com/PMelch/MBus.git#v<version>

@@ -16,7 +16,12 @@
     "signal",
     "events"
   ],
-  "license": "APACHE LICENSE, VERSION 2.0",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/PMelch/MBus.git"
+  },
+  "unity": "2021.3",
   "licensesUrl": "https://github.com/PMelch/MBus/blob/main/LICENSE",
   "changelogUrl": "https://github.com/PMelch/MBus/blob/main/CHANGELOG.md"
 }
