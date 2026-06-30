@@ -4,11 +4,15 @@
 [![openupm](https://img.shields.io/npm/v/com.melchart.mbus?label=openupm&registry_uri=https://package.openupm.com)](https://openupm.com/packages/com.melchart.mbus)
 
 
-# MBus - the Unity message bus
+# MBus - a message bus for Unity projects
 
-## MBus: Seamless Communication for Your Unity Project
+**Website:** [pmelch.github.io/MBus](https://pmelch.github.io/MBus/)
 
-Simplify inter-component communication in your Unity game with MBus, a lightweight and efficient message bus system. This powerful tool enables seamless exchange of data between different parts of your game using structured messages, whether they're classes or structs.
+> Unity and related marks are trademarks or registered trademarks of Unity Technologies or its affiliates. MBus is not affiliated with or endorsed by Unity.
+
+## MBus: Seamless communication for Unity projects
+
+Simplify inter-component communication in projects built with Unity by using MBus, a lightweight and efficient message bus system. This powerful tool enables seamless exchange of data between different parts of your game using structured messages, whether they're classes or structs.
 
 ## Effortless Message Handling
 
@@ -189,8 +193,6 @@ https://github.com/PMelch/MBus.git#v<version>
 ~~~
 
 Specify the version you want to install - for example for version 1.0.0 you would use https://github.com/PMelch/MBus.git#v1.0.0
-
-
 
 
 

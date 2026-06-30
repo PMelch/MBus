@@ -1,0 +1,320 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>MBus - message bus for Unity projects and typed event distribution</title>
+    <meta name="description" content="MBus is a lightweight message bus for Unity projects with typed C# messages, value subscriptions, event distribution, and lifecycle-aware listener cleanup.">
+    <meta name="keywords" content="message bus for Unity, event bus for Unity, event distribution, C# message bus, Unity pub/sub, event aggregator for Unity, typed messages Unity, Unity value subscriptions, automatic unsubscribe Unity events, OpenUPM Unity package">
+    <meta name="author" content="Peter Melchart">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://pmelch.github.io/MBus/">
+    <meta property="og:title" content="MBus - message bus for Unity projects">
+    <meta property="og:description" content="Typed event distribution for Unity gameplay code. Send C# messages, subscribe by type or value, and clean up listeners with MonoBehaviour lifecycle helpers.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://pmelch.github.io/MBus/">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="MBus - message bus for Unity projects">
+    <meta name="twitter:description" content="A lightweight message bus for Unity projects with typed messages, value subscriptions, and lifecycle-aware cleanup.">
+    <link rel="icon" href="./mbus-favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="./styles.css">
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "SoftwareSourceCode",
+        "name": "MBus",
+        "description": "A lightweight message bus for Unity projects with typed C# messages, event distribution, value subscriptions, and lifecycle-aware listener cleanup.",
+        "codeRepository": "https://github.com/PMelch/MBus",
+        "programmingLanguage": "C#",
+        "runtimePlatform": "Unity 2021.3",
+        "license": "https://github.com/PMelch/MBus/blob/main/LICENSE"
+      }
+    </script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <header class="site-header" aria-label="Primary navigation">
+      <a class="brand" href="#overview" aria-label="MBus home">
+        <span class="brand-mark" aria-hidden="true">
+          <img src="./mbus-logo.svg" alt="">
+        </span>
+        <span>
+          <strong>MBus</strong>
+          <small>Message bus for Unity</small>
+        </span>
+      </a>
+
+      <nav class="nav-links" aria-label="Site sections">
+        <a href="#install">Install</a>
+        <a href="#api">API</a>
+        <a href="#examples">Examples</a>
+        <a href="https://github.com/PMelch/MBus#readme">README</a>
+      </nav>
+
+      <a class="icon-link" href="https://github.com/PMelch/MBus" aria-label="Open MBus on GitHub">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 2a10 10 0 0 0-3.16 19.49c.5.09.68-.22.68-.48v-1.7c-2.78.6-3.37-1.18-3.37-1.18-.46-1.15-1.12-1.46-1.12-1.46-.91-.62.07-.61.07-.61 1.01.07 1.54 1.04 1.54 1.04.9 1.53 2.36 1.09 2.94.83.09-.65.35-1.09.64-1.34-2.22-.25-4.56-1.11-4.56-4.94 0-1.09.39-1.99 1.04-2.69-.1-.25-.45-1.27.1-2.65 0 0 .84-.27 2.75 1.03A9.5 9.5 0 0 1 12 7c.85 0 1.7.11 2.5.34 1.9-1.3 2.74-1.03 2.74-1.03.55 1.38.2 2.4.1 2.65.65.7 1.04 1.6 1.04 2.69 0 3.84-2.34 4.68-4.57 4.93.36.31.68.92.68 1.86V21c0 .27.18.58.69.48A10 10 0 0 0 12 2z"></path>
+        </svg>
+      </a>
+    </header>
+
+    <main id="main">
+      <section id="overview" class="hero" aria-labelledby="hero-title">
+        <div class="hero-grid">
+          <div class="hero-copy">
+            <div class="status-row" aria-label="Package facts">
+              <span>Unity 2021.3+</span>
+              <span>OpenUPM</span>
+              <span>Apache-2.0</span>
+            </div>
+            <p class="eyebrow">Lightweight C# event distribution</p>
+            <h1 id="hero-title">Typed messages. Clean Unity gameplay code.</h1>
+            <p class="hero-lede">
+              MBus is a small message bus for Unity projects, built for sending typed C# messages between components
+              without wiring direct scene references. Subscribe by type or value, dispatch through
+              one bus, and let MonoBehaviour lifecycle helpers clean up listeners.
+            </p>
+            <div class="hero-actions" aria-label="Primary actions">
+              <a class="button button-primary" href="#install">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M12 3v12"></path>
+                  <path d="m7 10 5 5 5-5"></path>
+                  <path d="M5 21h14"></path>
+                </svg>
+                Install MBus
+              </a>
+              <a class="button button-secondary" href="https://github.com/PMelch/MBus#readme">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M4 19.5V5a2 2 0 0 1 2-2h13v18H6a2 2 0 0 1-2-1.5z"></path>
+                  <path d="M8 7h7"></path>
+                  <path d="M8 11h8"></path>
+                </svg>
+                Read the README
+              </a>
+            </div>
+            <div class="command-strip" aria-label="OpenUPM install command">
+              <span class="terminal-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24">
+                  <path d="m6 8 4 4-4 4"></path>
+                  <path d="M12 16h6"></path>
+                </svg>
+              </span>
+              <code>openupm add com.melchart.mbus</code>
+            </div>
+          </div>
+
+          <div class="hero-panel" aria-label="MBus signal console">
+            <div class="signal-map" aria-hidden="true">
+              <svg viewBox="0 0 860 430">
+                <defs>
+                  <linearGradient id="signalGradient" x1="0" x2="860" y1="0" y2="430" gradientUnits="userSpaceOnUse">
+                    <stop offset="0" stop-color="#4ee7c4"></stop>
+                    <stop offset="0.65" stop-color="#a6e34f"></stop>
+                    <stop offset="1" stop-color="#ffb347"></stop>
+                  </linearGradient>
+                </defs>
+                <path class="grid-line" d="M60 84h760M60 172h760M60 260h760M134 42v312M314 42v312M494 42v312M674 42v312"></path>
+                <text class="flow-title" x="18" y="48">Event flow</text>
+
+                <g class="flow-card flow-publisher">
+                  <rect x="18" y="126" width="285" height="88" rx="8"></rect>
+                  <path class="flow-icon" d="m42 150 13-7 13 7v15l-13 7-13-7zM55 143v15M42 150l13 8 13-8"></path>
+                  <text class="flow-card-title" x="78" y="158">Publisher</text>
+                  <text class="flow-method" x="36" y="190">SendMessage(new PlayerHit())</text>
+                </g>
+
+                <g class="flow-card flow-listener">
+                  <rect x="600" y="32" width="242" height="86" rx="8"></rect>
+                  <path class="flow-icon" d="M626 61a9 9 0 1 0 0-18 9 9 0 0 0 0 18ZM611 84c0-11 7-17 15-17s15 6 15 17"></path>
+                  <text class="flow-card-title" x="654" y="61">PlayerHitListener</text>
+                  <text class="flow-method" x="621" y="92">SubscribeUntilDisabled</text>
+                </g>
+
+                <g class="flow-card flow-listener">
+                  <rect x="600" y="132" width="242" height="86" rx="8"></rect>
+                  <path class="flow-icon" d="M626 161a9 9 0 1 0 0-18 9 9 0 0 0 0 18ZM611 184c0-11 7-17 15-17s15 6 15 17"></path>
+                  <text class="flow-card-title" x="654" y="161">UI Hit Indicator</text>
+                  <text class="flow-method" x="621" y="192">Subscribe</text>
+                </g>
+
+                <g class="flow-card flow-listener">
+                  <rect x="600" y="232" width="242" height="86" rx="8"></rect>
+                  <path class="flow-icon" d="M626 261a9 9 0 1 0 0-18 9 9 0 0 0 0 18ZM611 284c0-11 7-17 15-17s15 6 15 17"></path>
+                  <text class="flow-card-title" x="654" y="261">Analytics System</text>
+                  <text class="flow-method" x="621" y="292">Subscribe</text>
+                </g>
+
+                <g class="flow-bus">
+                  <rect x="382" y="86" width="126" height="154" rx="10"></rect>
+                </g>
+
+                <path class="bus-line" d="M303 170H382"></path>
+                <path class="bus-line" d="M508 130H555V78H600"></path>
+                <path class="bus-line" d="M508 175H600"></path>
+                <path class="bus-line" d="M508 220H555V270H600"></path>
+
+                <circle class="flow-port" cx="303" cy="170" r="6"></circle>
+                <circle class="flow-port" cx="382" cy="170" r="6"></circle>
+                <circle class="flow-port" cx="508" cy="130" r="6"></circle>
+                <circle class="flow-port" cx="508" cy="175" r="6"></circle>
+                <circle class="flow-port" cx="508" cy="220" r="6"></circle>
+                <circle class="flow-port" cx="600" cy="78" r="6"></circle>
+                <circle class="flow-port" cx="600" cy="175" r="6"></circle>
+                <circle class="flow-port" cx="600" cy="270" r="6"></circle>
+
+                <image class="flow-bus-logo" href="./mbus-logo.svg" x="415" y="142" width="60" height="42" preserveAspectRatio="xMidYMid meet"></image>
+              </svg>
+            </div>
+
+            <div class="code-window">
+              <div class="window-bar">
+                <span></span>
+                <span></span>
+                <span></span>
+                <strong>GameplayEvents.cs</strong>
+              </div>
+              <pre><code>public readonly struct PlayerHit
+{
+    public readonly int Damage;
+    public PlayerHit(int damage) =&gt; Damage = damage;
+}
+
+mBus.SubscribeUntilDisabled&lt;PlayerHit&gt;(
+    OnHit, this);
+mBus.SendMessage(new PlayerHit(25));</code></pre>
+            </div>
+
+            <div class="route-readout" aria-label="Message route">
+              <span>PlayerHit</span>
+              <svg viewBox="0 0 84 18" aria-hidden="true">
+                <path d="M2 9h74"></path>
+                <path d="m69 3 7 6-7 6"></path>
+              </svg>
+              <span>HUD, Audio, Stats</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="install" class="section install-section" aria-labelledby="install-title">
+        <div class="section-heading">
+          <p class="eyebrow">Install</p>
+          <h2 id="install-title">Add MBus to a Unity project in one command.</h2>
+          <p>
+            Use OpenUPM for the fastest setup, or install a tagged release through Unity Package
+            Manager with a Git URL.
+          </p>
+        </div>
+        <div class="install-grid">
+          <article class="install-card">
+            <div class="card-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24">
+                <path d="M4 7 12 3l8 4-8 4z"></path>
+                <path d="M4 7v10l8 4 8-4V7"></path>
+                <path d="M12 11v10"></path>
+              </svg>
+            </div>
+            <h3>OpenUPM</h3>
+            <pre><code>openupm add com.melchart.mbus</code></pre>
+          </article>
+          <article class="install-card">
+            <div class="card-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24">
+                <path d="M10 13a5 5 0 0 0 7.07 0l2-2a5 5 0 0 0-7.07-7.07l-1.1 1.1"></path>
+                <path d="M14 11a5 5 0 0 0-7.07 0l-2 2a5 5 0 0 0 7.07 7.07l1.1-1.1"></path>
+              </svg>
+            </div>
+            <h3>Git URL</h3>
+            <pre><code>https://github.com/PMelch/MBus.git#v1.2.1</code></pre>
+          </article>
+        </div>
+      </section>
+
+      <section id="api" class="section api-section" aria-labelledby="api-title">
+        <div class="section-heading">
+          <p class="eyebrow">API shape</p>
+          <h2 id="api-title">Small surface area, useful distribution patterns.</h2>
+        </div>
+        <div class="feature-grid">
+          <article class="feature-card">
+            <h3>Typed messages</h3>
+            <p>Send classes, structs, strings, enums, and base-type messages through the same bus.</p>
+            <code>Subscribe&lt;T&gt;(handler)</code>
+          </article>
+          <article class="feature-card">
+            <h3>Value subscriptions</h3>
+            <p>Route enum or constant-style messages when a full message object is unnecessary.</p>
+            <code>Subscribe(handler, value)</code>
+          </article>
+          <article class="feature-card">
+            <h3>Lifecycle cleanup</h3>
+            <p>Attach listener lifetime to a MonoBehaviour being disabled or destroyed.</p>
+            <code>SubscribeUntilDestroyed&lt;T&gt;(...)</code>
+          </article>
+          <article class="feature-card">
+            <h3>Predictable nested sends</h3>
+            <p>Messages sent while handlers are running are queued, then delivered after the current dispatch.</p>
+            <code>SendMessage(message)</code>
+          </article>
+        </div>
+      </section>
+
+      <section id="examples" class="section examples-section" aria-labelledby="examples-title">
+        <div class="section-heading">
+          <p class="eyebrow">Examples</p>
+          <h2 id="examples-title">Publish events without coupling gameplay systems.</h2>
+        </div>
+        <div class="example-layout">
+          <article class="example-copy">
+            <h3>Use DI when you can, a global instance when you need one.</h3>
+            <p>
+              MBus does not dictate how you keep the bus instance. Bind it through Zenject or another
+              DI container for larger projects, or use <code>MBusInstance</code> for a simple global route.
+            </p>
+            <a class="text-link" href="https://github.com/PMelch/MBus#readme">
+              Open the full README
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M7 17 17 7"></path>
+                <path d="M8 7h9v9"></path>
+              </svg>
+            </a>
+          </article>
+          <div class="code-window code-window-large">
+            <div class="window-bar">
+              <span></span>
+              <span></span>
+              <span></span>
+              <strong>Signals.cs</strong>
+            </div>
+            <pre><code>public enum UiSignal
+{
+    PauseOpened,
+    PauseClosed
+}
+
+mBus.Subscribe(
+    OnPauseOpened, UiSignal.PauseOpened);
+mBus.SendMessage(UiSignal.PauseOpened);
+
+mBus.SubscribeUntilDestroyed&lt;object&gt;(
+    OnAnyMessage, this);</code></pre>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div>
+        <strong>MBus</strong>
+        <p>A lightweight message bus for Unity projects.</p>
+        <p class="trademark-note">Unity and related marks are trademarks or registered trademarks of Unity Technologies or its affiliates. MBus is not affiliated with or endorsed by Unity.</p>
+      </div>
+      <nav aria-label="Footer links">
+        <a href="https://github.com/PMelch/MBus#readme">README</a>
+        <a href="https://github.com/PMelch/MBus">GitHub</a>
+        <a href="https://openupm.com/packages/com.melchart.mbus/">OpenUPM</a>
+      </nav>
+    </footer>
+  </body>
+</html>
