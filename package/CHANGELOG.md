@@ -1,6 +1,11 @@
 Changelog
 =========
 
+### 1.3.0
+- Moved the Unity package into the `package/` subfolder so repository website files are no longer part of the UPM bundle.
+- Git URL installs must use `?path=package` (for example `https://github.com/PMelch/MBus.git?path=package#v1.3.0`).
+- Package documentation URL now points to https://pmelch.github.io/MBus/
+
 ### 1.1.0
 - added value subscriptions: it is possible now to subscribe to a specific value instead of just a type.
 ~~~
